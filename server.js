@@ -99,7 +99,6 @@ io.on("connection", (socket) => {
   socket.on("code-change", (data) => {
     const { fileId, content } = data;
 
-    // Save the latest code change for the file
     codeChanges.set(fileId, content);
 
     // Broadcast the change to all users in the project (except the sender)
