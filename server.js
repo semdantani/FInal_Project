@@ -59,8 +59,6 @@ io.use(async (socket, next) => {
 io.on("connection", (socket) => {
   const { projectId, userId } = socket;
 
-  console.log(`User ${userId} connected to project ${projectId}`);
-
   // Join the project room
   socket.join(projectId);
 
@@ -99,19 +97,17 @@ io.on("connection", (socket) => {
   socket.on("code-change", (data) => {
     const { fileId, content } = data;
 
+    // Save the latest code change for the file
     codeChanges.set(fileId, content);
 
     // Broadcast the change to all users in the project (except the sender)
     socket.broadcast
       .to(projectId)
       .emit("code-change", { fileId, content, userId });
-    console.log(`User ${userId} updated file ${fileId}`);
   });
 
   // Handle user disconnection
   socket.on("disconnect", () => {
-    console.log(`User ${userId} disconnected from project ${projectId}`);
-
     // Remove user from active users
     if (activeUsers.has(projectId)) {
       activeUsers.get(projectId).delete(userId);
@@ -126,6 +122,4 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+server.listen(port, () => {});

@@ -9,10 +9,7 @@ async function connect() {
 
   try {
     await mongoose.connect(uri);
-    console.log("connected to MongoDB");
-  } catch (error) {
-    console.log("not connected to MongoDB", error);
-  }
+  } catch (error) {}
 }
 
 export default connect;
