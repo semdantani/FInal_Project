@@ -1,18 +1,7 @@
 import Redis from "ioredis";
 
-const redisClient = new Redis({
-  host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT || 6379,
-  password: process.env.REDIS_PASSWORD,
-  tls: {},
-});
-
-redisClient.on("connect", () => {
-  console.log("Redis connected");
-});
-
-redisClient.on("error", (err) => {
-  console.error("Redis connection error:", err);
+const redisClient = new Redis(process.env.REDIS_URL, {
+  tls: {}, // still required for Redis Cloud
 });
 
 export default redisClient;
