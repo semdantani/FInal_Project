@@ -15,9 +15,7 @@ const port = process.env.PORT || 8080;
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://finalproject-frontend-six.vercel.app",
-    methods: ["GET", "POST"],
-    credentials: true,
+    origin: "*",
   },
 });
 
