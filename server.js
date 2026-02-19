@@ -15,7 +15,9 @@ const port = process.env.PORT || 8080;
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "https://finalproject-frontend-six.vercel.app",
+    methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
@@ -58,6 +60,8 @@ io.use(async (socket, next) => {
 
 io.on("connection", (socket) => {
   const { projectId, userId } = socket;
+
+  console.log(`User ${userId} connected to project ${projectId}`);
 
   // Join the project room
   socket.join(projectId);
@@ -104,16 +108,19 @@ io.on("connection", (socket) => {
     socket.broadcast
       .to(projectId)
       .emit("code-change", { fileId, content, userId });
+    console.log(`User ${userId} updated file ${fileId}`);
   });
 
   // Handle user disconnection
   socket.on("disconnect", () => {
+    console.log(`User ${userId} disconnected from project ${projectId}`);
+
     // Remove user from active users
     if (activeUsers.has(projectId)) {
       activeUsers.get(projectId).delete(userId);
       io.to(projectId).emit(
         "active-users",
-        Array.from(activeUsers.get(projectId))
+        Array.from(activeUsers.get(projectId)),
       );
     }
 
@@ -122,4 +129,6 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(port, () => {});
+server.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});

@@ -8,7 +8,13 @@ import cors from "cors";
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://finalproject-frontend-six.vercel.app",
+    credentials: true,
+  }),
+);
+
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
