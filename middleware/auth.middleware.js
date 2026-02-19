@@ -8,7 +8,7 @@ export const authUser = async (req, res, next) => {
       (req.headers.authorization && req.headers.authorization.split(" ")[1]);
 
     console.log("TOKEN RECEIVED:", token);
-    g;
+
     if (!token) {
       return res.status(401).json({ error: "Unauthorized User" });
     }
