@@ -3,8 +3,12 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+// const openai = new OpenAI({
+//   apiKey: process.env.OPENAI,
+// });
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI,
+  apiKey: process.env.OPENROUTER_API_KEY,
+  baseURL: "https://openrouter.ai/api/v1",
 });
 
 const SYSTEM_PROMPT = `
@@ -53,7 +57,7 @@ IMPORTANT: Don't use file names like routes/index.js or any nested file structur
 
 export const generateResult = async (prompt) => {
   const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: "mistralai/mistral-7b-instruct",
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
       { role: "user", content: prompt },
