@@ -1,28 +1,27 @@
 import JWT from "jsonwebtoken";
+import redisClient from "../services/redis.service.js";
 
 export const authUser = async (req, res, next) => {
   try {
     const token =
-      req.cookies?.token ||
+      req.cookies.token ||
       (req.headers.authorization && req.headers.authorization.split(" ")[1]);
 
     if (!token) {
-      return res.status(401).json({
-        error: "Unauthorized User - No Token",
-      });
+      return res.status(401).json({ error: "Unauthorized User" });
     }
 
-    const decoded = JWT.verify(token, process.env.JWT_SECRET);
+    const isBlacklisted = await redisClient.get(token);
+    if (isBlacklisted) {
+      res.cookie("token", "");
+      return res.status(401).send({ error: "Token expired" });
+    }
 
-    // Attach user to request
-    req.user = decoded;
-
+    const verified = JWT.verify(token, process.env.JWT_SECRET);
+    req.user = verified;
     next();
   } catch (error) {
-    console.log("Auth Error:", error.message);
-
-    return res.status(401).json({
-      error: "Unauthorized User - Invalid Token",
-    });
+    console.log(error);
+    res.status(401).json({ error: "Unauthorized user" });
   }
 };
