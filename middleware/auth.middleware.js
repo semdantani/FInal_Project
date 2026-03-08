@@ -3,19 +3,26 @@ import JWT from "jsonwebtoken";
 export const authUser = async (req, res, next) => {
   try {
     const token =
-      req.cookies.token ||
+      req.cookies?.token ||
       (req.headers.authorization && req.headers.authorization.split(" ")[1]);
 
     if (!token) {
-      return res.status(401).json({ error: "Unauthorized User" });
+      return res.status(401).json({
+        error: "Unauthorized User - No Token",
+      });
     }
 
-    const verified = JWT.verify(token, process.env.JWT_SECRET);
+    const decoded = JWT.verify(token, process.env.JWT_SECRET);
 
-    req.user = verified;
+    // Attach user to request
+    req.user = decoded;
+
     next();
   } catch (error) {
-    console.log(error);
-    res.status(401).json({ error: "Unauthorized user" });
+    console.log("Auth Error:", error.message);
+
+    return res.status(401).json({
+      error: "Unauthorized User - Invalid Token",
+    });
   }
 };
