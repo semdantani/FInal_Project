@@ -57,7 +57,7 @@ IMPORTANT: Don't use file names like routes/index.js or any nested file structur
 
 export const generateResult = async (prompt) => {
   const response = await openai.chat.completions.create({
-    model: "mistralai/mistral-7b-instruct",
+    model: "mistralai/mistral-7b-instruct:free",
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
       { role: "user", content: prompt },
