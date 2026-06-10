@@ -88,7 +88,7 @@ export const addUsersToProject = async ({ projectId, users, userId }) => {
     },
     {
       new: true,
-    }
+    },
   );
 
   return updatedProject;
@@ -134,7 +134,7 @@ export const updateFileTree = async ({ projectId, fileTree }) => {
     },
     {
       new: true,
-    }
+    },
   );
 
   return project;
@@ -161,6 +161,9 @@ export const deleteFileFromProject = async ({ projectId, filePath }) => {
 
   // Delete file from fileTree
   delete project.fileTree[filePath];
+
+  // FIX: Tell Mongoose explicitly that the fileTree object has been modified
+  project.markModified("fileTree");
 
   await project.save();
   return project;

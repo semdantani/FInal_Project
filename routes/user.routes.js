@@ -10,8 +10,8 @@ router.post(
   body("email").isEmail().withMessage("Email must be valid Email"),
   body("password")
     .isLength({ min: 6 })
-    .withMessage("Password must be at least ^ characters long"),
-  userController.createUserController
+    .withMessage("Password must be at least 6 characters long"),
+  userController.createUserController,
 );
 
 router.post(
@@ -20,13 +20,13 @@ router.post(
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),
-  userController.loginController
+  userController.loginController,
 );
 
 router.get(
   "/profile",
   authMiddleware.authUser,
-  userController.profileController
+  userController.profileController,
 );
 
 router.get("/logout", authMiddleware.authUser, userController.logoutController);
@@ -34,7 +34,7 @@ router.get("/logout", authMiddleware.authUser, userController.logoutController);
 router.get(
   "/all",
   authMiddleware.authUser,
-  userController.getAllUsersController
+  userController.getAllUsersController,
 );
 
 export default router;
