@@ -61,11 +61,13 @@ export const logoutController = async (req, res) => {
       req.cookies.token ||
       (req.headers.authorization && req.headers.authorization.split(" ")[1]);
 
-    await redisClient.set(token, "logout", "EX", 60 * 60 * 24);
-
+    // ✅ FIX: check token FIRST before trying to blacklist it
     if (!token) {
       return res.status(400).json({ error: "No token provided" });
     }
+
+    // ✅ FIX: only blacklist after confirming token exists
+    await redisClient.set(token, "logout", "EX", 60 * 60 * 24);
 
     res.status(200).json({
       message: "Logged out successfully",
