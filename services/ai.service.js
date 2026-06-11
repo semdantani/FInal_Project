@@ -3,9 +3,6 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// const openai = new OpenAI({
-//   apiKey: process.env.OPENAI,
-// });
 const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
   baseURL: "https://openrouter.ai/api/v1",
@@ -56,36 +53,56 @@ IMPORTANT: Don't use file names like routes/index.js or any nested file structur
 `;
 
 export const generateResult = async (prompt) => {
-  const response = await openai.chat.completions.create({
-    model: "mistralai/mistral-7b-instruct:free",
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: prompt },
-    ],
-    response_format: { type: "json_object" },
+  try {
+    const response = await openai.chat.completions.create({
+      // Ensure this model ID is currently active on OpenRouter
+      model: "mistralai/mistral-7b-instruct",
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: prompt },
+      ],
+      // Note: If you get errors about response_format not being supported by the model,
+      // you can safely comment out the line below. Your SYSTEM_PROMPT already enforces JSON well!
+      response_format: { type: "json_object" },
+      temperature: 0.4,
+    });
 
-    temperature: 0.4,
-  });
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error("AI Generation Error (generateResult):", error.message);
 
-  return response.choices[0].message.content;
+    // FIX: Return a safe, valid JSON string so the frontend parser doesn't crash
+    return JSON.stringify({
+      text: "Sorry, the AI service is currently unavailable or the model is offline. Please check your OpenRouter configuration.",
+    });
+  }
 };
+
 export const reviewCode = async (code) => {
   if (!code) throw new Error("Code is required for review");
 
   const prompt = `Analyze the following code. If it has errors, fix them and provide the corrected code.give better suggestion for given code.If it is error-free,explain its functionality:\n\n\`${code}\``;
 
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content:
-          "You are an AI code reviewer. Provide fixes for errors or explain the given code.",
-      },
-      { role: "user", content: prompt },
-    ],
-    max_tokens: 500,
-  });
+  try {
+    const response = await openai.chat.completions.create({
+      // FIX: Added 'openai/' prefix required by OpenRouter
+      model: "openai/gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an AI code reviewer. Provide fixes for errors or explain the given code.",
+        },
+        { role: "user", content: prompt },
+      ],
+      max_tokens: 500,
+    });
 
-  return response.choices[0].message.content;
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error("AI Generation Error (reviewCode):", error.message);
+
+    // FIX: Return a friendly text error instead of crashing
+    return "⚠️ Sorry, I am unable to review the code right now due to an API connection issue. Please try again later.";
+  }
 };
